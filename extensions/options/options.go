@@ -63,59 +63,49 @@ type Options struct {
 type OptionFn func(*Options)
 
 // WithExcludeGit sets whether or not to exclude git functionality
-func WithExcludeGit(exclude bool) OptionFn {
-	return func(o *Options) { o.ExcludeGit = exclude }
-}
+func WithExcludeGit(exclude bool) OptionFn { _ = "STUB: not implemented"; return *new(OptionFn) }
 
 // WithExtraFunctions configures the extension to also register the bundled
 // utility sql routines.
-func WithExtraFunctions() OptionFn {
-	return func(o *Options) { o.ExtraFunctions = true }
-}
+func WithExtraFunctions() OptionFn { _ = "STUB: not implemented"; return *new(OptionFn) }
 
 // WithGitHub configures the extension to also register the GitHub related tables and funcs
-func WithGitHub() OptionFn {
-	return func(o *Options) { o.GitHub = true }
-}
+func WithGitHub() OptionFn { _ = "STUB: not implemented"; return *new(OptionFn) }
 
 // WithGitHubClientGetter configures a way to use a custom GitHubv4 client
 func WithGitHubClientGetter(getter func() *githubv4.Client) OptionFn {
-	return func(o *Options) { o.GitHubClientGetter = getter }
+	_ = "STUB: not implemented"
+	return *new(OptionFn)
 }
 
 // WithGitHubRateLimitHandler configures a way to use a custom GitHub API rate limit handler
 func WithGitHubRateLimitHandler(handler func(*GitHubRateLimitResponse)) OptionFn {
-	return func(o *Options) { o.GitHubRateLimitHandler = handler }
+	_ = "STUB: not implemented"
+	return *new(OptionFn)
 }
 
 // WithGitHubPreRequestHook configures a way to use a custom GitHub API rate limit handler
-func WithGitHubPreRequestHook(f func()) OptionFn {
-	return func(o *Options) { o.GitHubPreRequestHook = f }
-}
+func WithGitHubPreRequestHook(f func()) OptionFn { _ = "STUB: not implemented"; return *new(OptionFn) }
 
 // WithGitHubPostRequestHook configures a way to use a custom GitHub API rate limit handler
-func WithGitHubPostRequestHook(f func()) OptionFn {
-	return func(o *Options) { o.GitHubPostRequestHook = f }
-}
+func WithGitHubPostRequestHook(f func()) OptionFn { _ = "STUB: not implemented"; return *new(OptionFn) }
 
 // WithSourcegraph configures the extension to also register the Sourcegraph related tables and funcs
-func WithSourcegraph() OptionFn {
-	return func(o *Options) { o.Sourcegraph = true }
-}
+func WithSourcegraph() OptionFn { _ = "STUB: not implemented"; return *new(OptionFn) }
 
 // WithSourcegraphClientGetter configures a way to use a custom graphql client
 func WithSourcegraphClientGetter(getter func() *graphql.Client) OptionFn {
-	return func(o *Options) { o.SourcegraphClientGetter = getter }
+	_ = "STUB: not implemented"
+	return *new(OptionFn)
 }
 
 // WithNPM configures the extension to also register the NPM related tables and funcs
-func WithNPM() OptionFn {
-	return func(o *Options) { o.NPM = true }
-}
+func WithNPM() OptionFn { _ = "STUB: not implemented"; return *new(OptionFn) }
 
 // WithNPMHttpClient sets *http.Client used by the NPM tables/funcs
 func WithNPMHttpClient(client *http.Client) OptionFn {
-	return func(o *Options) { o.NPMHttpClient = client }
+	_ = "STUB: not implemented"
+	return *new(OptionFn)
 }
 
 // RepoLocatorFn is an adapter type that adapts any function with compatible
@@ -123,27 +113,22 @@ func WithNPMHttpClient(client *http.Client) OptionFn {
 type RepoLocatorFn func(ctx context.Context, path string) (*git.Repository, error)
 
 func (fn RepoLocatorFn) Open(ctx context.Context, path string) (*git.Repository, error) {
-	return fn(ctx, path)
+	_ = "STUB: not implemented"
+	return nil,
+
+		// WithRepoLocator uses the provided locator implementation
+		// for locating and opening git repositories.
+		nil
 }
 
-// WithRepoLocator uses the provided locator implementation
-// for locating and opening git repositories.
 func WithRepoLocator(loc services.RepoLocator) OptionFn {
-	return func(o *Options) { o.Locator = loc }
+	_ = "STUB: not implemented"
+	return *new(OptionFn)
 }
 
 // WithContextValue sets a value on the options context.
 // It will override any existing value set with the same key
-func WithContextValue(key, value string) OptionFn {
-	return func(o *Options) {
-		if o.Context == nil {
-			o.Context = make(map[string]string)
-		}
-		o.Context[key] = value
-	}
-}
+func WithContextValue(key, value string) OptionFn { _ = "STUB: not implemented"; return *new(OptionFn) }
 
 // WithLogger sets a logger for the underlying extensions to use
-func WithLogger(logger *zerolog.Logger) OptionFn {
-	return func(o *Options) { o.Logger = logger }
-}
+func WithLogger(logger *zerolog.Logger) OptionFn { _ = "STUB: not implemented"; return *new(OptionFn) }

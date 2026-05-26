@@ -15,6 +15,4 @@ type Options struct {
 }
 
 // GetSourcegraphTokenFromCtx looks up the sourcegraphToken key in the supplied context and returns it if set
-func GetSourcegraphTokenFromCtx(ctx services.Context) string {
-	return ctx["sourcegraphToken"]
-}
+func GetSourcegraphTokenFromCtx(ctx services.Context) string { _ = "STUB: not implemented"; return "" }

@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/mergestat/mergestat-lite/pkg/display"
 	. "github.com/mergestat/mergestat-lite/pkg/query"
@@ -57,29 +56,11 @@ func init() {
 
 // setupLogger sets the global logger variable according to whether the verbose flag is used
 // or if the DEBUG environment variable is set to anything
-func setupLogger() {
-	l := zerolog.New(os.Stderr).
-		Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.Stamp}).
-		Level(zerolog.ErrorLevel).
-		With().
-		Timestamp().Logger()
-	if debug := os.Getenv("DEBUG") != ""; verbose || debug {
-		l = l.Level(zerolog.InfoLevel)
-		if debug {
-			l = l.Level(zerolog.DebugLevel)
-		}
-	}
-	logger = l
-}
+func setupLogger() { _ = "STUB: not implemented"; return }
 
 // handleExitError should be used for any errors that should stop execution of the CLI (exit)
 // it will report an error with the logger and exit with code 1
-func handleExitError(err error) {
-	if err != nil {
-		logger.Error().Msgf(err.Error())
-		os.Exit(1)
-	}
-}
+func handleExitError(err error) { _ = "STUB: not implemented"; return }
 
 var rootCmd = &cobra.Command{
 	Use:  `mergestat "SELECT * FROM commits"`,
@@ -148,11 +129,7 @@ Example queries can be found in the GitHub repo: https://github.com/mergestat/me
 	},
 }
 
-func isPiped(info os.FileInfo) bool { return info.Mode()&os.ModeCharDevice == 0 }
+func isPiped(info os.FileInfo) bool { _ = "STUB: not implemented"; return false }
 
 // Execute executes the root command
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		handleExitError(fmt.Errorf("execution failed: %v", err))
-	}
-}
+func Execute() { _ = "STUB: not implemented"; return }

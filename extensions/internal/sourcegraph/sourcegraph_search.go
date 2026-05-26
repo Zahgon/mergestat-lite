@@ -2,8 +2,6 @@ package sourcegraph
 
 import (
 	"context"
-	"encoding/json"
-	"io"
 
 	"github.com/augmentable-dev/vtab"
 	"github.com/shurcooL/graphql"
@@ -125,22 +123,8 @@ type fetchSourcegraphOptions struct {
 }
 
 func fetchSearch(ctx context.Context, input *fetchSourcegraphOptions) (*searchResults, error) {
-	var sourcegraphQuery struct {
-		Search struct {
-			Results searchResults
-		} `graphql:"search(query: $query, version: V2)"`
-	}
-
-	variables := map[string]interface{}{
-		"query": graphql.String(input.Query),
-	}
-
-	err := input.Client.Query(ctx, &sourcegraphQuery, variables)
-	if err != nil {
-		return nil, err
-	}
-
-	return &sourcegraphQuery.Search.Results, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type iterResults struct {
@@ -150,92 +134,11 @@ type iterResults struct {
 	results *searchResults
 }
 
-func (i *iterResults) Column(ctx vtab.Context, c int) error {
-	var current struct {
-		Typename                 graphql.String      "graphql:\"__typename\""
-		FileMatchFields          fileMatch           "graphql:\"... on FileMatch\""
-		CommitSearchResultFields commitSearchResults "graphql:\"... on CommitSearchResult\""
-		RepositoryFields         repositoryFields    "graphql:\"... on Repository\""
-	}
-	if i.current < len(i.results.Results) {
-		current = i.results.Results[i.current]
-	}
-	col := searchCols[c]
-	switch col.Name {
-	case "__typename":
-		ctx.ResultText(string(current.Typename))
-	case "results":
-		switch current.Typename {
-		case "Repository":
-			res, err := json.Marshal(current.RepositoryFields)
-			if err != nil {
-				return err
-			}
-			ctx.ResultText(string(res))
-		case "CommitSearchResult":
-			res, err := json.Marshal(current.CommitSearchResultFields)
-			if err != nil {
-				return err
-			}
-			ctx.ResultText(string(res))
-		case "FileMatch":
-			res, err := json.Marshal(current.FileMatchFields)
-			if err != nil {
-				return err
-			}
-			ctx.ResultText(string(res))
-		default:
-			res, err := json.Marshal(i.results.Alert)
-			if err != nil {
-				ctx.ResultError(err)
-				return err
-			}
-			ctx.ResultText(string(res))
-		}
-	case "cloning":
-		res, err := json.Marshal(i.results.Cloning)
-		if err != nil {
-			return err
-		}
-		ctx.ResultText(string(res))
-	case "missing":
-		res, err := json.Marshal(i.results.Missing)
-		if err != nil {
-			return err
-		}
-		ctx.ResultText(string(res))
-	case "timed_out":
-		res, err := json.Marshal(i.results.Timedout)
-		if err != nil {
-			return err
-		}
-		ctx.ResultText(string(res))
-	case "match_count":
-		ctx.ResultInt(int(i.results.MatchCount))
-	case "elapsed_milliseconds":
-		ctx.ResultInt(int(i.results.ElapsedMilliseconds))
-	}
-
-	return nil
-}
+func (i *iterResults) Column(ctx vtab.Context, c int) error { _ = "STUB: not implemented"; return nil }
 
 func (i *iterResults) Next() (vtab.Row, error) {
-	var err error
-	if i.current == -1 {
-		i.results, err = fetchSearch(context.Background(), &fetchSourcegraphOptions{i.Client(), i.query})
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	i.current += 1
-	length := len(i.results.Results)
-
-	if i.results == nil || (i.current >= length && i.current > 0) {
-		return nil, io.EOF
-	}
-
-	return i, nil
+	_ = "STUB: not implemented"
+	return *new(vtab.Row), nil
 }
 
 var searchCols = []vtab.Column{
@@ -250,17 +153,6 @@ var searchCols = []vtab.Column{
 }
 
 func NewSourcegraphSearchModule(opts *Options) sqlite.Module {
-	return vtab.NewTableFunc("sourcegraph_search", searchCols, func(constraints []*vtab.Constraint, orders []*sqlite.OrderBy) (vtab.Iterator, error) {
-		var query string
-		for _, constraint := range constraints {
-			if constraint.Op == sqlite.INDEX_CONSTRAINT_EQ {
-				switch constraint.ColIndex {
-				case 0:
-					query = constraint.Value.Text()
-				}
-			}
-		}
-		opts.Logger.Info().Msgf("running Sourcegraph search: %s", query)
-		return &iterResults{opts, query, -1, nil}, nil
-	})
+	_ = "STUB: not implemented"
+	return *new(sqlite.Module)
 }

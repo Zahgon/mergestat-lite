@@ -1,13 +1,6 @@
 package github
 
 import (
-	"context"
-	"errors"
-	"fmt"
-	"strings"
-
-	"github.com/mergestat/mergestat-lite/extensions/options"
-	"github.com/shurcooL/githubv4"
 	"go.riyazali.net/sqlite"
 )
 
@@ -15,82 +8,14 @@ type repoFileContent struct {
 	opts *Options
 }
 
-func (f *repoFileContent) Args() int           { return -1 }
-func (f *repoFileContent) Deterministic() bool { return false }
+func (f *repoFileContent) Args() int           { _ = "STUB: not implemented"; return 0 }
+func (f *repoFileContent) Deterministic() bool { _ = "STUB: not implemented"; return false }
 func (f *repoFileContent) Apply(ctx *sqlite.Context, values ...sqlite.Value) {
-	err := f.opts.RateLimiter.Wait(context.Background())
-	if err != nil {
-		ctx.ResultError(err)
-		return
-	}
-
-	var fileContentsQuery struct {
-		RateLimit  *options.GitHubRateLimitResponse
-		Repository struct {
-			Object struct {
-				Blob struct {
-					Text string
-				} `graphql:"... on Blob"`
-			} `graphql:"object(expression: $expression)"`
-		} `graphql:"repository(owner: $owner, name: $name)"`
-	}
-
-	var owner, name, expression string
-	switch len(values) {
-	case 0:
-		ctx.ResultError(errors.New("need to supply a repo"))
-		return
-	case 1:
-		ctx.ResultError(errors.New("need to supply a file path"))
-		return
-	case 2:
-		splitStr := strings.Split(values[0].Text(), "/")
-		if len(splitStr) != 2 {
-			ctx.ResultError(errors.New("invalid repo name, must be of format owner/name"))
-			return
-		}
-		owner = splitStr[0]
-		name = splitStr[1]
-		expression = values[1].Text()
-	default:
-		owner = values[0].Text()
-		name = values[1].Text()
-		expression = values[2].Text()
-	}
-
-	if !strings.Contains(expression, ":") {
-		expression = fmt.Sprintf("HEAD:%s", expression)
-	}
-
-	l := f.opts.Logger.With().Str("owner", owner).Str("name", name).Str("expression", expression).Logger()
-	l.Info().Msgf("fetching GitHub file contents for %s", expression)
-
-	variables := map[string]interface{}{
-		"owner":      githubv4.String(owner),
-		"name":       githubv4.String(name),
-		"expression": githubv4.String(expression),
-	}
-
-	err = f.opts.RateLimiter.Wait(context.Background())
-	if err != nil {
-		ctx.ResultError(err)
-		return
-	}
-
-	f.opts.GitHubPreRequestHook()
-
-	err = f.opts.Client().Query(context.Background(), &fileContentsQuery, variables)
-
-	f.opts.GitHubPostRequestHook()
-
-	if err != nil {
-		ctx.ResultError(err)
-		return
-	}
-	f.opts.RateLimitHandler(fileContentsQuery.RateLimit)
-	ctx.ResultText(fileContentsQuery.Repository.Object.Blob.Text)
+	_ = "STUB: not implemented"
+	return
 }
 
 func NewRepoFileContentFunc(opts *Options) sqlite.Function {
-	return &repoFileContent{opts}
+	_ = "STUB: not implemented"
+	return *new(sqlite.Function)
 }

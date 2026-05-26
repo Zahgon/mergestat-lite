@@ -2,12 +2,9 @@ package cmd
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
-	"github.com/mergestat/mergestat-lite/pkg/display"
 	"github.com/spf13/cobra"
 )
 
@@ -29,70 +26,21 @@ type queryServiceHandler struct {
 }
 
 func newQueryServiceHandler() (*queryServiceHandler, error) {
-	if db, err := sql.Open("sqlite3", ":memory:"); err != nil {
-		return nil, fmt.Errorf("failed to initialize database connection: %v", err)
-	} else {
-		return &queryServiceHandler{DB: db}, nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (h *queryServiceHandler) Close() error {
-	return h.DB.Close()
-}
+func (h *queryServiceHandler) Close() error { _ = "STUB: not implemented"; return nil }
 
 // handleErr is a helper for writing errors to the http response
 func (h *queryServiceHandler) handleErr(w http.ResponseWriter, statusCode int, err error) {
-	if statusCode == 0 {
-		statusCode = http.StatusInternalServerError
-	}
-	w.WriteHeader(statusCode)
-
-	var output []byte
-	var marshalErr error
-	if output, marshalErr = json.Marshal(map[string]string{
-		"error": err.Error(),
-	}); marshalErr != nil {
-		logger.Error().Msg(marshalErr.Error())
-		return
-	}
-
-	if _, err := w.Write(output); err != nil {
-		logger.Error().Msg(err.Error())
-		return
-	}
-
-	logger.Warn().Msgf("handled request with error code=%d, message=%s", statusCode, err.Error())
+	_ = "STUB: not implemented"
+	return
 }
 
 func (h *queryServiceHandler) httpHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodPost {
-		h.handleErr(w, http.StatusBadRequest, fmt.Errorf("must POST to this endpoint"))
-	}
-
-	var body []byte
-	var err error
-	if body, err = io.ReadAll(req.Body); err != nil {
-		h.handleErr(w, http.StatusBadRequest, err)
-		return
-	}
-
-	var serviceQueryRequest ServiceQueryRequest
-	if err = json.Unmarshal(body, &serviceQueryRequest); err != nil {
-		h.handleErr(w, http.StatusBadRequest, err)
-		return
-	}
-
-	if rows, err := h.DB.QueryContext(req.Context(), serviceQueryRequest.Query); err != nil {
-		h.handleErr(w, http.StatusInternalServerError, err)
-		return
-	} else {
-		if err = display.WriteTo(rows, w, "json", false); err != nil {
-			h.handleErr(w, http.StatusInternalServerError, err)
-			return
-		}
-	}
-
-	logger.Info().Msgf(`handled request for query=%q`, serviceQueryRequest.Query)
+	_ = "STUB: not implemented"
+	return
 }
 
 var serveCmd = &cobra.Command{

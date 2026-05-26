@@ -2,8 +2,6 @@ package github
 
 import (
 	"context"
-	"io"
-	"strings"
 
 	"github.com/augmentable-dev/vtab"
 	"github.com/mergestat/mergestat-lite/extensions/options"
@@ -49,40 +47,8 @@ type fetchBranchProtectionResults struct {
 }
 
 func (i *iterProtections) fetchProtections(ctx context.Context, startCursor *githubv4.String) (*fetchBranchProtectionResults, error) {
-	var Query struct {
-		RateLimit  *options.GitHubRateLimitResponse
-		Repository struct {
-			Owner struct {
-				Login string
-			}
-			Name                  string
-			BranchProtectionRules struct {
-				Nodes    []*protectionRules
-				PageInfo struct {
-					EndCursor   githubv4.String
-					HasNextPage bool
-				}
-			} `graphql:"branchProtectionRules(first: $perpage, after: $protectionCursor)"`
-		} `graphql:"repository(owner: $owner, name: $name)"`
-	}
-	variables := map[string]interface{}{
-		"owner":            githubv4.String(i.owner),
-		"name":             githubv4.String(i.name),
-		"perpage":          githubv4.Int(i.PerPage),
-		"protectionCursor": startCursor,
-	}
-
-	err := i.Client().Query(ctx, &Query, variables)
-	if err != nil {
-		return nil, err
-	}
-
-	return &fetchBranchProtectionResults{
-		RateLimit:   Query.RateLimit,
-		Edges:       Query.Repository.BranchProtectionRules.Nodes,
-		HasNextPage: Query.Repository.BranchProtectionRules.PageInfo.HasNextPage,
-		EndCursor:   &Query.Repository.BranchProtectionRules.PageInfo.EndCursor,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type iterProtections struct {
@@ -93,97 +59,16 @@ type iterProtections struct {
 	results *fetchBranchProtectionResults
 }
 
-func (i *iterProtections) logger() *zerolog.Logger {
-	logger := i.Logger.With().Int("per-page", i.PerPage).Str("owner", i.owner).Str("name", i.name).Logger()
-	return &logger
-}
+func (i *iterProtections) logger() *zerolog.Logger { _ = "STUB: not implemented"; return nil }
 
 func (i *iterProtections) Column(ctx vtab.Context, c int) error {
-	current := i.results.Edges[i.current]
-	col := protectionCols[c]
-
-	switch col.Name {
-	case "allow_deletions":
-		ctx.ResultInt(t1f0(current.AllowsDeletions))
-	case "allows_force_pushes":
-		ctx.ResultInt(t1f0(current.AllowsForcePushes))
-	case "creator_login":
-		ctx.ResultText(string(current.Creator.Login))
-	case "database_id":
-		ctx.ResultInt(current.DatabaseId)
-	case "dismisses_stale_reviews":
-		ctx.ResultInt(t1f0(current.DismissesStaleReviews))
-	case "is_admin_enforced":
-		ctx.ResultInt(t1f0(current.IsAdminEnforced))
-	case "pattern":
-		ctx.ResultText(current.Pattern)
-	case "required_approving_review_count":
-		ctx.ResultInt(current.RequiredApprovingReviewCount)
-	case "required_status_check_contexts":
-		ctx.ResultText(strings.Join(current.RequiredStatusCheckContexts, ", "))
-	case "requires_approving_reviews":
-		ctx.ResultInt(t1f0(current.RequiresApprovingReviews))
-	case "requires_code_owners_reviews":
-		ctx.ResultInt(t1f0(current.RequiresCodeOwnerReviews))
-	case "requires_commit_signature":
-		ctx.ResultInt(t1f0(current.RequiresCommitSignatures))
-	case "requires_conversation_resolution":
-		ctx.ResultInt(t1f0(current.RequiresConversationResolution))
-	case "requires_linear_history":
-		ctx.ResultInt(t1f0(current.RequiresLinearHistory))
-	case "requires_status_checks":
-		ctx.ResultInt(t1f0(current.RequiresStatusChecks))
-	case "requires_strict_status_checks":
-		ctx.ResultInt(t1f0(current.RequiresStrictStatusChecks))
-	case "restricts_pushes":
-		ctx.ResultInt(t1f0(current.RestrictsPushes))
-	case "restricts_review_dismissal":
-		ctx.ResultInt(t1f0(current.RestrictsReviewDismissals))
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (i *iterProtections) Next() (vtab.Row, error) {
-	i.current += 1
-
-	if i.results == nil || i.current >= len(i.results.Edges) {
-		if i.results == nil || i.results.HasNextPage {
-			err := i.RateLimiter.Wait(context.Background())
-			if err != nil {
-				return nil, err
-			}
-
-			var cursor *githubv4.String
-			if i.results != nil {
-				cursor = i.results.EndCursor
-			}
-
-			i.Options.GitHubPreRequestHook()
-
-			l := i.logger().With().Interface("cursor", cursor).Logger()
-			l.Info().Msgf("fetching page of repo_protections for %s/%s", i.owner, i.name)
-			results, err := i.fetchProtections(context.Background(), cursor)
-
-			i.Options.GitHubPostRequestHook()
-
-			if err != nil {
-				return nil, err
-			}
-
-			i.Options.RateLimitHandler(results.RateLimit)
-
-			i.results = results
-			i.current = 0
-
-			if len(i.results.Edges) == 0 {
-				return nil, io.EOF
-			}
-		} else {
-			return nil, io.EOF
-		}
-	}
-
-	return i, nil
+	_ = "STUB: not implemented"
+	return *new(vtab.Row), nil
 }
 
 var protectionCols = []vtab.Column{
@@ -210,26 +95,6 @@ var protectionCols = []vtab.Column{
 }
 
 func NewProtectionsModule(opts *Options) sqlite.Module {
-	return vtab.NewTableFunc("github_repo_prs", protectionCols, func(constraints []*vtab.Constraint, orders []*sqlite.OrderBy) (vtab.Iterator, error) {
-		var fullNameOrOwner, name string
-		for _, constraint := range constraints {
-			if constraint.Op == sqlite.INDEX_CONSTRAINT_EQ {
-				switch constraint.ColIndex {
-				case 0:
-					fullNameOrOwner = constraint.Value.Text()
-				case 1:
-					name = constraint.Value.Text()
-				}
-			}
-		}
-
-		owner, name, err := repoOwnerAndName(name, fullNameOrOwner)
-		if err != nil {
-			return nil, err
-		}
-
-		iter := &iterProtections{opts, owner, name, -1, nil}
-		iter.logger().Info().Msgf("starting GitHub repo_protections iterator for %s/%s", owner, name)
-		return iter, nil
-	}, vtab.EarlyOrderByConstraintExit(true))
+	_ = "STUB: not implemented"
+	return *new(sqlite.Module)
 }

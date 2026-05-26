@@ -32,4 +32,4 @@ var queries = map[string]string{
 }
 
 // Find finds and return the named query
-func Find(name string) (string, bool) { q, ok := queries[name]; return q, ok }
+func Find(name string) (string, bool) { _ = "STUB: not implemented"; return "", false }
